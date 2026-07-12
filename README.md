@@ -229,9 +229,3 @@ http://localhost:3000
 **Debasmita Jana**
 
 - GitHub: https://github.com/Debasmita2003
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
