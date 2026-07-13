@@ -32,10 +32,39 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Update a note
+router.put("/:id", async (req, res) => {
+  try {
+    const { title, content } = req.body;
+
+    const result = await pool.query(
+      `UPDATE notes
+       SET title = $1,
+           content = $2,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3
+       RETURNING *`,
+      [title, content, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 // Delete a note
 router.delete("/:id", async (req, res) => {
   try {
-    await pool.query("DELETE FROM notes WHERE id = $1", [req.params.id]);
+    await pool.query(
+      "DELETE FROM notes WHERE id = $1",
+      [req.params.id]
+    );
 
     res.json({ message: "Note deleted" });
   } catch (err) {
