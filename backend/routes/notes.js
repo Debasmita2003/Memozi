@@ -8,6 +8,7 @@ router.get("/", async (req, res) => {
     const result = await pool.query(
       "SELECT * FROM notes ORDER BY created_at DESC"
     );
+
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -18,11 +19,24 @@ router.get("/", async (req, res) => {
 // Add a new note
 router.post("/", async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const {
+      title,
+      content,
+      titleColor,
+      contentColor,
+    } = req.body;
 
     const result = await pool.query(
-      "INSERT INTO notes (title, content) VALUES ($1, $2) RETURNING *",
-      [title, content]
+      `INSERT INTO notes
+      (title, content, title_color, content_color)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *`,
+      [
+        title,
+        content,
+        titleColor || "#ffffff",
+        contentColor || "#d1d5db",
+      ]
     );
 
     res.status(201).json(result.rows[0]);
@@ -35,20 +49,36 @@ router.post("/", async (req, res) => {
 // Update a note
 router.put("/:id", async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const {
+      title,
+      content,
+      titleColor,
+      contentColor,
+    } = req.body;
 
     const result = await pool.query(
       `UPDATE notes
-       SET title = $1,
-           content = $2,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $3
+       SET
+         title = $1,
+         content = $2,
+         title_color = $3,
+         content_color = $4,
+         updated_at = CURRENT_TIMESTAMP
+       WHERE id = $5
        RETURNING *`,
-      [title, content, req.params.id]
+      [
+        title,
+        content,
+        titleColor,
+        contentColor,
+        req.params.id,
+      ]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Note not found" });
+      return res.status(404).json({
+        message: "Note not found",
+      });
     }
 
     res.json(result.rows[0]);
@@ -66,7 +96,9 @@ router.delete("/:id", async (req, res) => {
       [req.params.id]
     );
 
-    res.json({ message: "Note deleted" });
+    res.json({
+      message: "Note deleted",
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Server Error" });
