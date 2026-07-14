@@ -9,10 +9,13 @@ A modern full-stack note-taking application built with **Next.js**, **Express.js
 - 📝 Create notes
 - 📖 View all saved notes
 - 🗑️ Delete notes
+- ✏️ Edit notes
+- 🎨 Custom note colors
 - 🔖 Bookmark support
 - 💾 Persistent storage with PostgreSQL
 - 🎨 Modern glassmorphism UI
 - 📱 Responsive design
+- 👤 User Authentication
 
 ---
 
@@ -213,12 +216,9 @@ http://localhost:3000
 
 ## 🔮 Future Improvements
 
-- ✏️ Edit notes
 - 📌 Pin notes
-- 🎨 Custom note colors
 - 🔍 Search functionality
 - 🏷️ Categories & Tags
-- 👤 User Authentication
 - ☁️ Cloud Deployment
 - 📱 Progressive Web App (PWA)
 
