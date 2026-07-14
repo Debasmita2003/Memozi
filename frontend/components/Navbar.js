@@ -8,6 +8,7 @@ import { useSearch } from "@/context/SearchContext";
 import LanguageToggle from "./LanguageToggle";
 import SignupModal from "./SignupModal";
 import LoginModal from "./LoginModal";
+import ProfileModal from "./ProfileModal";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -21,7 +22,7 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
-
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const linkStyle = (path) =>
     pathname === path
       ? "text-white"
@@ -52,14 +53,6 @@ useEffect(() => {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  setUser(null);
-  setProfileOpen(false);
-
-  router.refresh();      // refresh navbar
 const handleLogout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
@@ -67,8 +60,8 @@ const handleLogout = () => {
   setUser(null);
   setProfileOpen(false);
 
-  window.location.reload();
-};};
+  router.push("/");
+};
 
   return (<>
     <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50
@@ -169,7 +162,7 @@ const handleLogout = () => {
       onClick={() => setProfileOpen(!profileOpen)}
       className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold"
     >
-      {user.name[0].toUpperCase()}
+      {user?.name?.charAt(0)?.toUpperCase() || "U"}
     </button>
 
     {profileOpen && (
@@ -185,12 +178,15 @@ const handleLogout = () => {
           </p>
         </div>
 
-        <Link
-          href="/profile"
-          className="block px-4 py-2 hover:bg-white/10 transition"
-        >
-          Profile
-        </Link>
+        <button
+  onClick={() => {
+    setProfileOpen(false);
+    setProfileModalOpen(true);
+  }}
+  className="block w-full text-left px-4 py-2 hover:bg-white/10 transition"
+>
+  Profile
+</button>
 
         <Link
           href="/settings"
@@ -246,6 +242,11 @@ const handleLogout = () => {
     setLoginOpen(false);
     setSignupOpen(true);
   }}
+/>
+<ProfileModal
+  isOpen={profileModalOpen}
+  onClose={() => setProfileModalOpen(false)}
+  setUser={setUser}
 />
 </>
   );

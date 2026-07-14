@@ -128,4 +128,41 @@ router.post("/login", async (req, res) => {
   }
 });
 
+  // ===============================
+// UPDATE PROFILE
+// ===============================
+
+router.put("/profile", async (req, res) => {
+  try {
+    const { id, name, profile_picture } = req.body;
+
+    if (!id || !name) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE users
+       SET name = $1,
+           profile_picture = $2
+       WHERE id = $3
+       RETURNING id, name, email, profile_picture, language`,
+      [name, profile_picture, id]
+    );
+
+    res.json({
+      message: "Profile updated successfully",
+      user: result.rows[0],
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 module.exports = router;
