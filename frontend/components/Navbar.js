@@ -5,10 +5,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Bell, Search, X } from "lucide-react";
 import { useSearch } from "@/context/SearchContext";
-import LanguageToggle from "./LanguageToggle";
 import SignupModal from "./SignupModal";
 import LoginModal from "./LoginModal";
 import ProfileModal from "./ProfileModal";
+import SettingsModal from "./SettingsModal";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -23,6 +23,7 @@ export default function Navbar() {
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const linkStyle = (path) =>
     pathname === path
       ? "text-white"
@@ -90,10 +91,6 @@ const handleLogout = () => {
             Bookmarks
           </Link>
         </div>
-
-        <div className="flex items-center gap-4">
-  <LanguageToggle />
-</div>
 
         <div className="flex items-center space-x-5">
 
@@ -188,12 +185,15 @@ const handleLogout = () => {
   Profile
 </button>
 
-        <Link
-          href="/settings"
-          className="block px-4 py-2 hover:bg-white/10 transition"
-        >
-          Settings
-        </Link>
+        <button
+  onClick={() => {
+    setProfileOpen(false);
+    setSettingsOpen(true);
+  }}
+  className="block w-full text-left px-4 py-2 hover:bg-white/10 transition"
+>
+  Settings
+</button>
 
         <button
           onClick={handleLogout}
@@ -247,6 +247,10 @@ const handleLogout = () => {
   isOpen={profileModalOpen}
   onClose={() => setProfileModalOpen(false)}
   setUser={setUser}
+/>
+<SettingsModal
+  isOpen={settingsOpen}
+  onClose={() => setSettingsOpen(false)}
 />
 </>
   );

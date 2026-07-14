@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import "../i18n";
 import Navbar from "../components/Navbar";
 import { SearchProvider } from "../context/SearchContext";
 

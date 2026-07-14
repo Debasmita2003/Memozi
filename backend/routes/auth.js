@@ -115,7 +115,6 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         profile_picture: user.profile_picture,
-        language: user.language,
       },
     });
 
@@ -165,4 +164,58 @@ router.put("/profile", async (req, res) => {
   }
 });
 
+// =======================================
+// UPDATE SETTINGS
+// =======================================
+
+router.put("/settings", async (req, res) => {
+  try {
+    const {
+      id,
+      auto_save,
+      notifications,
+      compact_mode,
+      spell_check,
+    } = req.body;
+
+    const result = await pool.query(
+      `UPDATE users
+       SET
+         auto_save = $1,
+         notifications = $2,
+         compact_mode = $3,
+         spell_check = $4
+       WHERE id = $5
+       RETURNING
+         id,
+         name,
+         email,
+         profile_picture,
+         auto_save,
+         notifications,
+         compact_mode,
+         spell_check`,
+      [
+        
+        auto_save,
+        notifications,
+        compact_mode,
+        spell_check,
+        id,
+      ]
+    );
+
+    res.json({
+      message: "Settings updated successfully",
+      user: result.rows[0],
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
 module.exports = router;

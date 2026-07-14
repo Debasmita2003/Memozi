@@ -1,8 +1,5 @@
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
-
 export default function Home() {
-  const { t } = useTranslation();
   return (
     <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
@@ -18,7 +15,7 @@ export default function Home() {
         </h1>
 
         <div className="mt-10 text-lg md:text-2xl text-gray-200 mb-10 max-w-2xl">
-      {t("Welcome to memozi")}
+      <h1>Welcome to memozi</h1>
     </div>
 
         <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl">

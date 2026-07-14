@@ -68,7 +68,7 @@ export default function ProfileModal({
         JSON.stringify(res.data.user)
       );
 
-      // Update Navbar immediately
+      // Update Navbar instantly
       setUser(res.data.user);
 
       alert("Profile Updated!");
@@ -90,22 +90,24 @@ export default function ProfileModal({
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-[101]">
-        <div className="w-full max-w-md rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl p-8 relative">
+
+        <div className="w-full max-w-sm rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl p-6 relative">
 
           {/* Close */}
           <button
             onClick={onClose}
-            className="absolute right-5 top-5 text-gray-300 hover:text-white"
+            className="absolute right-5 top-5 text-gray-300 hover:text-white transition"
           >
-            <X size={22} />
+            <X size={20} />
           </button>
 
-          <h1 className="text-3xl font-bold text-white mb-8">
+          {/* Title */}
+          <h1 className="text-xl font-semibold mb-5">
             My Profile
           </h1>
 
           {/* Avatar */}
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-6">
 
             <div className="relative">
 
@@ -113,17 +115,17 @@ export default function ProfileModal({
                 <img
                   src={localUser.profile_picture}
                   alt="Profile"
-                  className="w-28 h-28 rounded-full object-cover border-4 border-indigo-500"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500"
                 />
               ) : (
-                <div className="w-28 h-28 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-4xl font-bold text-white">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-3xl font-bold text-white">
                   {localUser.name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
               )}
 
               <label className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full cursor-pointer hover:bg-indigo-500 transition">
 
-                <Camera size={18} className="text-white" />
+                <Camera size={16} className="text-white" />
 
                 <input
                   type="file"
@@ -136,55 +138,58 @@ export default function ProfileModal({
 
             </div>
 
-            <p className="text-gray-300 text-sm mt-3">
+            <p className="text-xs text-gray-300 mt-3">
               Change Profile Picture
             </p>
 
           </div>
 
           {/* Name */}
-          <div className="relative mb-5">
+          <div className="relative mb-4">
 
             <User
               size={18}
-              className="absolute left-4 top-4 text-gray-400"
+              className="absolute left-4 top-3.5 text-gray-400"
             />
 
             <input
+              type="text"
               name="name"
               value={localUser.name}
               onChange={handleChange}
               placeholder="Full Name"
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white outline-none focus:border-indigo-500"
+              className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none focus:border-indigo-500"
             />
 
           </div>
 
           {/* Email */}
-          <div className="relative mb-8">
+          <div className="relative mb-6">
 
             <Mail
               size={18}
-              className="absolute left-4 top-4 text-gray-400"
+              className="absolute left-4 top-3.5 text-gray-400"
             />
 
             <input
+              type="email"
               value={localUser.email}
               disabled
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 cursor-not-allowed"
+              className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 cursor-not-allowed"
             />
 
           </div>
 
-          {/* Save */}
+          {/* Save Button */}
           <button
             onClick={handleSave}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:opacity-90 transition"
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:opacity-90 transition"
           >
             Save Changes
           </button>
 
         </div>
+
       </div>
     </>
   );
