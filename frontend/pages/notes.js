@@ -89,11 +89,6 @@ export default function Notes() {
 
   const saveNote = async () => {
   if (!title || !content) return;
-console.log({
-  title,
-  content,
-  pinned,
-});
   try {
     if (editingId) {
       await axios.put(`${API}/${editingId}`, {

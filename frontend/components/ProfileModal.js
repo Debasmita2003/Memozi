@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Camera, User, Mail } from "lucide-react";
 
 export default function ProfileModal({
@@ -15,6 +15,8 @@ export default function ProfileModal({
     email: "",
     profile_picture: "",
   });
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -35,31 +37,24 @@ export default function ProfileModal({
     });
   };
 
-  const handleImage = (e) => {
+  // Upload Profile Picture
+  const handleProfileUpload = async (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
 
-    const reader = new FileReader();
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+    formData.append("id", localUser.id);
 
-    reader.onloadend = () => {
-      setLocalUser((prev) => ({
-        ...prev,
-        profile_picture: reader.result,
-      }));
-    };
-
-    reader.readAsDataURL(file);
-  };
-
-  const handleSave = async () => {
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/auth/profile",
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/upload-profile",
+        formData,
         {
-          id: localUser.id,
-          name: localUser.name,
-          profile_picture: localUser.profile_picture,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
@@ -68,7 +63,33 @@ export default function ProfileModal({
         JSON.stringify(res.data.user)
       );
 
-      // Update Navbar instantly
+      setLocalUser(res.data.user);
+      setUser(res.data.user);
+
+      alert("Profile picture updated!");
+    } catch (err) {
+      console.log(err);
+      alert("Upload failed");
+    }
+  };
+
+  // Save Name
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(
+        "http://localhost:5000/api/auth/profile",
+        {
+          id: localUser.id,
+          name: localUser.name,
+        }
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
+
+      setLocalUser(res.data.user);
       setUser(res.data.user);
 
       alert("Profile Updated!");
@@ -102,7 +123,7 @@ export default function ProfileModal({
           </button>
 
           {/* Title */}
-          <h1 className="text-xl font-semibold mb-5">
+          <h1 className="text-xl font-semibold mb-5 text-white">
             My Profile
           </h1>
 
@@ -113,7 +134,7 @@ export default function ProfileModal({
 
               {localUser.profile_picture ? (
                 <img
-                  src={localUser.profile_picture}
+                  src={`http://localhost:5000/${localUser.profile_picture}`}
                   alt="Profile"
                   className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500"
                 />
@@ -123,24 +144,28 @@ export default function ProfileModal({
                 </div>
               )}
 
-              <label className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full cursor-pointer hover:bg-indigo-500 transition">
-
+              <label
+                className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full cursor-pointer hover:bg-indigo-500 transition"
+              >
                 <Camera size={16} className="text-white" />
 
                 <input
                   type="file"
                   accept="image/*"
                   hidden
-                  onChange={handleImage}
+                  ref={fileInputRef}
+                  onChange={handleProfileUpload}
                 />
-
               </label>
 
             </div>
 
-            <p className="text-xs text-gray-300 mt-3">
+            <button
+              onClick={() => fileInputRef.current.click()}
+              className="mt-4 text-sm text-indigo-400 hover:text-indigo-300 transition"
+            >
               Change Profile Picture
-            </p>
+            </button>
 
           </div>
 
@@ -180,7 +205,7 @@ export default function ProfileModal({
 
           </div>
 
-          {/* Save Button */}
+          {/* Save */}
           <button
             onClick={handleSave}
             className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:opacity-90 transition"

@@ -156,11 +156,21 @@ const handleLogout = () => {
           {user ? (
   <div className="relative" ref={profileRef}>
     <button
-      onClick={() => setProfileOpen(!profileOpen)}
-      className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold"
-    >
+  onClick={() => setProfileOpen(!profileOpen)}
+  className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center"
+>
+  {user?.profile_picture ? (
+    <img
+      src={`http://localhost:5000/${user.profile_picture}`}
+      alt="Profile"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <span className="text-white text-sm font-semibold">
       {user?.name?.charAt(0)?.toUpperCase() || "U"}
-    </button>
+    </span>
+  )}
+</button>
 
     {profileOpen && (
       <div className="absolute right-0 mt-3 w-56 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-xl shadow-indigo-500/10 py-2 text-sm text-white">
