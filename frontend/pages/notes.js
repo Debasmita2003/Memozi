@@ -137,11 +137,14 @@ export default function Notes() {
     }
   };
 
-  const filteredNotes = notes.filter(
-    (note) =>
-      note.title.toLowerCase().includes(query.toLowerCase()) ||
-      note.content.toLowerCase().includes(query.toLowerCase())
+  const filteredNotes = notes.filter((note) => {
+  const search = query.toLowerCase();
+
+  return (
+    (note.title || "").toLowerCase().includes(search) ||
+    (note.content || "").toLowerCase().includes(search)
   );
+});
 
   return (
     <div
@@ -257,7 +260,9 @@ export default function Notes() {
         </div>
 
         {filteredNotes.length === 0 ? (
-          <p className="text-gray-300">No notes found.</p>
+          <p className="text-center text-gray-400 text-lg mt-10">
+  🔍 No notes match your search.
+</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
 
