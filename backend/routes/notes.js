@@ -6,8 +6,8 @@ const pool = require("../config/db");
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM notes ORDER BY created_at DESC"
-    );
+  "SELECT * FROM notes ORDER BY pinned DESC, created_at DESC"
+);
 
     res.json(result.rows);
   } catch (err) {
@@ -24,18 +24,20 @@ router.post("/", async (req, res) => {
       content,
       titleColor,
       contentColor,
+      pinned,
     } = req.body;
 
     const result = await pool.query(
       `INSERT INTO notes
-      (title, content, title_color, content_color)
-      VALUES ($1, $2, $3, $4)
+      (title, content, title_color, content_color, pinned)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *`,
       [
         title,
         content,
         titleColor || "#ffffff",
         contentColor || "#d1d5db",
+        pinned || false,
       ]
     );
 
@@ -54,6 +56,7 @@ router.put("/:id", async (req, res) => {
       content,
       titleColor,
       contentColor,
+      pinned,
     } = req.body;
 
     const result = await pool.query(
@@ -63,14 +66,16 @@ router.put("/:id", async (req, res) => {
          content = $2,
          title_color = $3,
          content_color = $4,
+         pinned = $5,
          updated_at = CURRENT_TIMESTAMP
-       WHERE id = $5
+       WHERE id = $6
        RETURNING *`,
       [
         title,
         content,
         titleColor,
         contentColor,
+        pinned,
         req.params.id,
       ]
     );

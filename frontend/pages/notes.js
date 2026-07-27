@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Trash2, Pencil, Palette } from "lucide-react";
+import { Trash2, Pencil, Palette , Pin} from "lucide-react";
 import { useSearch } from "@/context/SearchContext";
+
 
 export default function Notes() {
   const { query } = useSearch();
@@ -18,6 +19,7 @@ export default function Notes() {
   const [showContentPalette, setShowContentPalette] = useState(false);
   const titlePickerRef = useRef(null);
   const contentPickerRef = useRef(null);
+  const [pinned, setPinned] = useState(false);
 
   const palette = [
   "#FFFFFF",
@@ -87,7 +89,11 @@ export default function Notes() {
 
   const saveNote = async () => {
   if (!title || !content) return;
-
+console.log({
+  title,
+  content,
+  pinned,
+});
   try {
     if (editingId) {
       await axios.put(`${API}/${editingId}`, {
@@ -95,6 +101,7 @@ export default function Notes() {
         content,
         titleColor,
         contentColor,
+        pinned,
       });
     } else {
       await axios.post(API, {
@@ -102,6 +109,7 @@ export default function Notes() {
         content,
         titleColor,
         contentColor,
+        pinned,
       });
     }
 
@@ -110,7 +118,7 @@ export default function Notes() {
     setTitleColor("#ffffff");
     setContentColor("#d1d5db");
     setEditingId(null);
-
+    setPinned(false);
     setShowTitlePalette(false);
     setShowContentPalette(false);
     
@@ -126,6 +134,7 @@ export default function Notes() {
   setTitleColor(note.title_color);
   setContentColor(note.content_color);
   setEditingId(note.id);
+  setPinned(note.pinned);
 };
 
   const deleteNote = async (id) => {
@@ -145,7 +154,10 @@ export default function Notes() {
     (note.content || "").toLowerCase().includes(search)
   );
 });
-
+// ⭐ Sort pinned notes first
+const sortedNotes = [...filteredNotes].sort(
+  (a, b) => Number(b.pinned) - Number(a.pinned)
+);
   return (
     <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
@@ -256,7 +268,16 @@ export default function Notes() {
           >
             {editingId ? "Update Note" : "Add Note"}
           </button>
-
+<button
+onClick={() => setPinned(!pinned)}
+className={`ml-3 p-2 rounded-lg transition ${
+pinned
+? "bg-yellow-500 text-white"
+: "bg-white/10 text-gray-300"
+}`}
+>
+<Pin size={18}/>
+</button>
         </div>
 
         {filteredNotes.length === 0 ? (
@@ -266,7 +287,7 @@ export default function Notes() {
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
 
-            {filteredNotes.map((note) => (
+            {sortedNotes.map((note) => (
               <div
   key={note.id}
   className="relative backdrop-blur-xl bg-white/10 hover:bg-white/15 p-6 rounded-2xl border border-white/20 shadow-lg hover:shadow-indigo-500/20 transition-all duration-300"
@@ -276,23 +297,30 @@ export default function Notes() {
 }}
 >
 
-                <div className="absolute top-4 right-4 flex gap-3">
+                <div className="absolute top-4 right-4 flex items-center gap-3">
 
-                  <button
-                    onClick={() => editNote(note)}
-                    className="text-blue-400 hover:text-blue-600 transition"
-                  >
-                    <Pencil size={18} />
-                  </button>
+  {note.pinned && (
+    <Pin
+      size={18}
+      className="text-yellow-400 fill-yellow-400"
+    />
+  )}
 
-                  <button
-                    onClick={() => deleteNote(note.id)}
-                    className="text-red-400 hover:text-red-600 transition"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+  <button
+    onClick={() => editNote(note)}
+    className="text-blue-400 hover:text-blue-600 transition"
+  >
+    <Pencil size={18} />
+  </button>
 
-                </div>
+  <button
+    onClick={() => deleteNote(note.id)}
+    className="text-red-400 hover:text-red-600 transition"
+  >
+    <Trash2 size={18} />
+  </button>
+
+</div>
 
                 <h2
   className="text-xl font-semibold mb-2"
