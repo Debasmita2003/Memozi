@@ -87,8 +87,8 @@ const handleLogout = () => {
           <Link href="/notes" className={linkStyle("/notes")}>
             Notes
           </Link>
-          <Link href="/bookmarks" className={linkStyle("/bookmarks")}>
-            Bookmarks
+          <Link href="/collections" className={linkStyle("/collections")}>
+            Collections
           </Link>
         </div>
 

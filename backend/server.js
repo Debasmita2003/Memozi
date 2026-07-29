@@ -8,20 +8,27 @@ require("./config/db");
 
 // Import Routes
 const authRoutes = require("./routes/auth");
+const notesRoutes = require("./routes/notes");
+const collectionsRoutes = require("./routes/collections");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
-app.use("/api/auth", authRoutes);          // ✅ Authentication
-app.use("/api/notes", require("./routes/notes"));
-app.use("/api/bookmarks", require("./routes/bookmarks"));
+// Serve uploaded profile pictures
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
-// Test route
+// API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/notes", notesRoutes);
+app.use("/api/collections", collectionsRoutes);
+
+// Test Route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotebookPen, Folder } from "lucide-react";
 export default function Home() {
   return (
     <div
@@ -10,36 +11,41 @@ export default function Home() {
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-20 text-white">
+
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           Memozi
         </h1>
 
-        <div className="mt-10 text-lg md:text-2xl text-gray-200 mb-10 max-w-2xl">
-      <h1>Welcome to memozi</h1>
-    </div>
+        <h2 className="mt-10 text-2xl md:text-3xl font-semibold text-gray-100 mb-6">
+          Welcome to Memozi
+        </h2>
 
-        <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl">
-          A modern way to manage notes and bookmarks <br />
-  with a clean, glass-inspired interface.
-  
+        <p className="text-xs md:text-xl text-gray-200 mb-10 max-w-xl leading-relaxed">
+          Organize your thoughts, create beautiful <span className="text-indigo-400 font-semibold">notes</span>, and keep everything
+          structured with <span className="text-indigo-400 font-semibold">Collections</span>.
+          A modern workspace designed to help you capture ideas effortlessly.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
+
           <Link
   href="/notes"
-  className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 hover:shadow-lg transition-all duration-300 text-center text-white font-medium"
+  className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 hover:shadow-lg transition-all duration-300 text-center text-white font-medium flex items-center justify-center gap-2"
 >
-  Get Started
+  <NotebookPen size={20} />
+  My Notes
 </Link>
 
           <Link
-            href="/bookmarks"
-            className="px-6 py-3 rounded-xl bg-white/20 backdrop-blur hover:bg-white/30 transition text-center"
-          >
-            View Bookmarks
-          </Link>
-          
+  href="/collections"
+  className="px-6 py-3 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 hover:scale-105 transition-all duration-300 text-center text-white font-medium flex items-center justify-center gap-2"
+>
+  <Folder size={20} />
+  View Collections
+</Link>
+
         </div>
+
       </div>
     </div>
   );
