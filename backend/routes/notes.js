@@ -2,12 +2,19 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 
-// Get all notes
-router.get("/", async (req, res) => {
+// =======================================
+// Get all notes for a user
+// =======================================
+
+router.get("/:userId", async (req, res) => {
   try {
     const result = await pool.query(
-  "SELECT * FROM notes ORDER BY pinned DESC, created_at DESC"
-);
+      `SELECT *
+       FROM notes
+       WHERE user_id = $1
+       ORDER BY pinned DESC, created_at DESC`,
+      [req.params.userId]
+    );
 
     res.json(result.rows);
   } catch (err) {
@@ -16,7 +23,10 @@ router.get("/", async (req, res) => {
   }
 });
 
+// =======================================
 // Add a new note
+// =======================================
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -25,12 +35,13 @@ router.post("/", async (req, res) => {
       titleColor,
       contentColor,
       pinned,
+      userId,
     } = req.body;
 
     const result = await pool.query(
       `INSERT INTO notes
-      (title, content, title_color, content_color, pinned)
-      VALUES ($1, $2, $3, $4, $5)
+      (title, content, title_color, content_color, pinned, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`,
       [
         title,
@@ -38,6 +49,7 @@ router.post("/", async (req, res) => {
         titleColor || "#ffffff",
         contentColor || "#d1d5db",
         pinned || false,
+        userId,
       ]
     );
 
@@ -48,7 +60,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update a note
+// =======================================
+// Update note
+// =======================================
+
 router.put("/:id", async (req, res) => {
   try {
     const {
@@ -57,6 +72,7 @@ router.put("/:id", async (req, res) => {
       titleColor,
       contentColor,
       pinned,
+      userId,
     } = req.body;
 
     const result = await pool.query(
@@ -69,6 +85,7 @@ router.put("/:id", async (req, res) => {
          pinned = $5,
          updated_at = CURRENT_TIMESTAMP
        WHERE id = $6
+       AND user_id = $7
        RETURNING *`,
       [
         title,
@@ -77,6 +94,7 @@ router.put("/:id", async (req, res) => {
         contentColor,
         pinned,
         req.params.id,
+        userId,
       ]
     );
 
@@ -93,13 +111,25 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Delete a note
-router.delete("/:id", async (req, res) => {
+// =======================================
+// Delete note
+// =======================================
+
+router.delete("/:id/:userId", async (req, res) => {
   try {
-    await pool.query(
-      "DELETE FROM notes WHERE id = $1",
-      [req.params.id]
+    const result = await pool.query(
+      `DELETE FROM notes
+       WHERE id = $1
+       AND user_id = $2
+       RETURNING *`,
+      [req.params.id, req.params.userId]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
 
     res.json({
       message: "Note deleted",

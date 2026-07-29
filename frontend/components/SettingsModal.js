@@ -14,6 +14,7 @@ export default function SettingsModal({
   isOpen,
   onClose,
 }) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [settings, setSettings] = useState({
     id: "",
     language: "English",
@@ -48,7 +49,25 @@ export default function SettingsModal({
       [key]: !prev[key],
     }));
   };
+const handleDeleteAccount = async () => {
+  try {
+    await axios.delete(
+      `http://localhost:5000/api/auth/delete-account/${settings.id}`
+    );
 
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    setShowDeleteConfirm(false);
+
+    alert("Account deleted successfully.");
+
+    window.location.href = "/";
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete account.");
+  }
+};
   const handleSave = async () => {
     try {
       const res = await axios.put(
@@ -68,7 +87,7 @@ export default function SettingsModal({
       alert("Failed to update settings");
     }
   };
-
+  
   return (
     <>
       {/* Overlay */}
@@ -163,10 +182,13 @@ export default function SettingsModal({
               Change Password
             </button>
 
-            <button className="w-full text-left py-2 text-sm text-red-400 hover:text-red-300 transition flex items-center gap-2">
-              <Trash2 size={16} />
-              Delete Account
-            </button>
+<button
+  onClick={() => setShowDeleteConfirm(true)}
+  className="w-full text-left py-2 text-sm text-red-400 hover:text-red-300 transition flex items-center gap-2"
+>
+  <Trash2 size={16} />
+  Delete Account
+</button>
 
           </div>
 
@@ -182,6 +204,58 @@ export default function SettingsModal({
         </div>
 
       </div>
+      {showDeleteConfirm && (
+  <>
+    {/* Backdrop */}
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200]" />
+
+    {/* Modal */}
+    <div className="fixed inset-0 flex items-center justify-center z-[201] px-4">
+      <div className="w-full max-w-sm rounded-3xl border border-white/15 bg-white/10 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-5">
+
+        {/* Icon */}
+        <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center mb-5">
+          <Trash2 className="text-red-400" size={22} />
+        </div>
+
+        {/* Title */}
+        <h2 className="text-xl font-semibold text-white">
+          Delete Account
+        </h2>
+
+        {/* Description */}
+        <p className="mt-2 text-sm text-gray-300 leading-relaxed">
+          This will permanently delete your account, notes, bookmarks,
+          and all associated data.
+        </p>
+
+        <p className="mt-2 text-xs text-red-300">
+          This action cannot be undone.
+        </p>
+
+        {/* Buttons */}
+        <div className="mt-8 flex justify-end gap-2">
+
+          <button
+            onClick={() => setShowDeleteConfirm(false)}
+            className="px-6 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleDeleteAccount}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-300"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </>
+)}
     </>
   );
 }

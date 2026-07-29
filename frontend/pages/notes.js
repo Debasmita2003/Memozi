@@ -80,7 +80,9 @@ export default function Notes() {
 
   const fetchNotes = async () => {
     try {
-      const res = await axios.get(API);
+      const user = JSON.parse(localStorage.getItem("user"));
+
+const res = await axios.get(`${API}/${user.id}`);
       setNotes(res.data);
     } catch (err) {
       console.error(err);
@@ -89,6 +91,7 @@ export default function Notes() {
 
   const saveNote = async () => {
   if (!title || !content) return;
+  const user = JSON.parse(localStorage.getItem("user"));
   try {
     if (editingId) {
       await axios.put(`${API}/${editingId}`, {
@@ -97,6 +100,7 @@ export default function Notes() {
         titleColor,
         contentColor,
         pinned,
+        userId: user.id,
       });
     } else {
       await axios.post(API, {
@@ -105,6 +109,7 @@ export default function Notes() {
         titleColor,
         contentColor,
         pinned,
+        userId: user.id,
       });
     }
 
@@ -134,7 +139,9 @@ export default function Notes() {
 
   const deleteNote = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`);
+      const user = JSON.parse(localStorage.getItem("user"));
+
+await axios.delete(`${API}/${id}/${user.id}`);
       fetchNotes();
     } catch (err) {
       console.error(err);
