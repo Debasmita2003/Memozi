@@ -331,8 +331,9 @@ export default function Collections() {
                     onClick={() =>
                       openAddNotes(collection.id)
                     }
-                    className="mb-5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
                   >
+                    <Plus size={18} />
                     Add Existing Notes
                   </button>
 

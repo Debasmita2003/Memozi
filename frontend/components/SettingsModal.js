@@ -129,7 +129,7 @@ const handleChangePassword = async () => {
         "user",
         JSON.stringify(res.data.user)
       );
-
+      window.dispatchEvent(new Event("settingsUpdated"));
       alert("Settings Updated!");
       onClose();
     } catch (err) {

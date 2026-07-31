@@ -20,7 +20,7 @@ export default function Notes() {
   const titlePickerRef = useRef(null);
   const contentPickerRef = useRef(null);
   const [pinned, setPinned] = useState(false);
-
+  const [spellCheck, setSpellCheck] = useState(true);    
   const palette = [
   "#FFFFFF",
   "#F8FAFC",
@@ -77,17 +77,36 @@ export default function Notes() {
     document.removeEventListener("mousedown", handleClickOutside);
   };
 }, []);
+useEffect(() => {
+  const loadSettings = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
 
-  const fetchNotes = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
 
-const res = await axios.get(`${API}/${user.id}`);
-      setNotes(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    setSpellCheck(user.spell_check ?? true);
+    
   };
+
+  loadSettings();
+
+  window.addEventListener("settingsUpdated", loadSettings);
+
+  return () => {
+    window.removeEventListener("settingsUpdated", loadSettings);
+  };
+}, []);
+  const fetchNotes = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) return;
+
+    const res = await axios.get(`${API}/${user.id}`);
+    setNotes(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const saveNote = async () => {
   if (!title || !content) return;
@@ -181,13 +200,16 @@ const sortedNotes = [...filteredNotes].sort(
 >
 
   <input
-    type="text"
-    placeholder="Title"
-    value={title}
-    style={{ color: titleColor }}
-    onChange={(e) => setTitle(e.target.value)}
-    className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-indigo-400 pr-12"
-  />
+  type="text"
+  placeholder="Title"
+  value={title}
+  spellCheck={spellCheck}
+  autoCorrect={spellCheck ? "on" : "off"}
+  autoCapitalize="sentences"
+  style={{ color: titleColor }}
+  onChange={(e) => setTitle(e.target.value)}
+  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-indigo-400 pr-12"
+/>
 
   <button
   type="button"
@@ -225,13 +247,16 @@ const sortedNotes = [...filteredNotes].sort(
   className="relative mb-5"
 >
   <textarea
-    placeholder="Write your note..."
-    rows="4"
-    value={content}
-    style={{ color: contentColor }}
-    onChange={(e) => setContent(e.target.value)}
-    className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-indigo-400 pr-12"
-  />
+  placeholder="Write your note..."
+  rows="4"
+  value={content}
+  spellCheck={spellCheck}
+  autoCorrect={spellCheck ? "on" : "off"}
+  autoCapitalize="sentences"
+  style={{ color: contentColor }}
+  onChange={(e) => setContent(e.target.value)}
+  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-indigo-400 pr-12"
+/>
 
   <button
   type="button"
