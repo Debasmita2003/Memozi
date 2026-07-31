@@ -24,3 +24,33 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.ProseMirror h1 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+.ProseMirror ul {
+  list-style: disc !important;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror ol {
+  list-style: decimal !important;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror li {
+  display: list-item;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: #94a3b8;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
