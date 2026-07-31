@@ -290,4 +290,71 @@ router.delete("/delete-account/:id", async (req, res) => {
     });
   }
 });
+// ======================================
+// CHANGE PASSWORD
+// ======================================
+
+router.put("/change-password", async (req, res) => {
+  try {
+    const {
+      userId,
+      currentPassword,
+      newPassword,
+    } = req.body;
+
+    // Find user
+    const user = await pool.query(
+      `
+      SELECT *
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
+    );
+
+    if (user.rows.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Check current password
+    const validPassword = await bcrypt.compare(
+      currentPassword,
+      user.rows[0].password
+    );
+
+    if (!validPassword) {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      10
+    );
+
+    // Update password
+    await pool.query(
+      `
+      UPDATE users
+      SET password = $1
+      WHERE id = $2
+      `,
+      [hashedPassword, userId]
+    );
+
+    res.json({
+      message: "Password updated successfully",
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
 module.exports = router;

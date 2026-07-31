@@ -3,6 +3,34 @@ const router = express.Router();
 const pool = require("../config/db");
 
 // ======================================
+// GET ALL COLLECTIONS
+// ======================================
+
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        c.*,
+        COUNT(cn.note_id)::int AS note_count
+      FROM collections c
+      LEFT JOIN collection_notes cn
+      ON c.id = cn.collection_id
+      WHERE c.user_id = $1
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+      `,
+      [req.params.userId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+// ======================================
 // GET NOTES INSIDE COLLECTION
 // ======================================
 
@@ -23,9 +51,7 @@ router.get("/:collectionId/notes", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -47,48 +73,13 @@ router.get("/:collectionId/available/:userId", async (req, res) => {
       )
       ORDER BY pinned DESC, created_at DESC
       `,
-      [
-        req.params.userId,
-        req.params.collectionId,
-      ]
+      [req.params.userId, req.params.collectionId]
     );
 
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
-  }
-});
-
-// ======================================
-// GET ALL COLLECTIONS
-// ======================================
-
-router.get("/:userId", async (req, res) => {
-  try {
-    const result = await pool.query(
-      `
-      SELECT
-        c.*,
-        COUNT(cn.note_id)::int AS note_count
-      FROM collections c
-      LEFT JOIN collection_notes cn
-      ON c.id = cn.collection_id
-      WHERE c.user_id = $1
-      GROUP BY c.id
-      ORDER BY c.created_at DESC
-      `,
-      [req.params.userId]
-    );
-
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -113,9 +104,7 @@ router.post("/", async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -144,9 +133,7 @@ router.post("/add-note", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -154,28 +141,30 @@ router.post("/add-note", async (req, res) => {
 // REMOVE NOTE FROM COLLECTION
 // ======================================
 
-router.delete("/:collectionId/:noteId", async (req, res) => {
+router.delete("/remove-note/:collectionId/:noteId", async (req, res) => {
   try {
-    await pool.query(
+    const result = await pool.query(
       `
       DELETE FROM collection_notes
       WHERE collection_id = $1
       AND note_id = $2
+      RETURNING *
       `,
-      [
-        req.params.collectionId,
-        req.params.noteId,
-      ]
+      [req.params.collectionId, req.params.noteId]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Note not found in collection",
+      });
+    }
 
     res.json({
       message: "Note removed successfully",
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -183,8 +172,9 @@ router.delete("/:collectionId/:noteId", async (req, res) => {
 // DELETE COLLECTION
 // ======================================
 
-router.delete("/:id/:userId", async (req, res) => {
+router.delete("/delete/:id/:userId", async (req, res) => {
   try {
+    // Remove all mappings first
     await pool.query(
       `
       DELETE FROM collection_notes
@@ -193,6 +183,7 @@ router.delete("/:id/:userId", async (req, res) => {
       [req.params.id]
     );
 
+    // Delete collection
     const result = await pool.query(
       `
       DELETE FROM collections
@@ -200,10 +191,7 @@ router.delete("/:id/:userId", async (req, res) => {
       AND user_id = $2
       RETURNING *
       `,
-      [
-        req.params.id,
-        req.params.userId,
-      ]
+      [req.params.id, req.params.userId]
     );
 
     if (result.rows.length === 0) {
@@ -217,9 +205,7 @@ router.delete("/:id/:userId", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      error: "Server Error",
-    });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 

@@ -15,6 +15,13 @@ export default function SettingsModal({
   onClose,
 }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+const [currentPassword, setCurrentPassword] = useState("");
+
+const [newPassword, setNewPassword] = useState("");
+
+const [confirmPassword, setConfirmPassword] = useState("");
   const [settings, setSettings] = useState({
     id: "",
     language: "English",
@@ -67,6 +74,49 @@ const handleDeleteAccount = async () => {
     console.error(err);
     alert("Failed to delete account.");
   }
+};
+const handleChangePassword = async () => {
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  try {
+
+    const res = await axios.put(
+      "http://localhost:5000/api/auth/change-password",
+      {
+        userId: settings.id,
+        currentPassword,
+        newPassword,
+      }
+    );
+
+    alert(res.data.message);
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+
+    setShowPasswordModal(false);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.response?.data?.message ||
+      "Failed to change password."
+    );
+
+  }
+
 };
   const handleSave = async () => {
     try {
@@ -178,9 +228,12 @@ const handleDeleteAccount = async () => {
               </h3>
             </div>
 
-            <button className="w-full text-left py-2 text-sm hover:text-indigo-400 transition">
-              Change Password
-            </button>
+            <button
+  onClick={() => setShowPasswordModal(true)}
+  className="w-full text-left py-2 text-sm hover:text-indigo-400 transition"
+>
+  Change Password
+</button>
 
 <button
   onClick={() => setShowDeleteConfirm(true)}
@@ -204,6 +257,76 @@ const handleDeleteAccount = async () => {
         </div>
 
       </div>
+      {showPasswordModal && (
+  <>
+    <div
+      className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200]"
+      onClick={() => setShowPasswordModal(false)}
+    />
+
+    <div className="fixed inset-0 flex items-center justify-center z-[201]">
+
+      <div className="w-full max-w-md rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 p-6">
+
+        <h2 className="text-2xl font-semibold text-white mb-6">
+          Change Password
+        </h2>
+
+        <input
+          type="password"
+          placeholder="Current Password"
+          value={currentPassword}
+          onChange={(e) =>
+            setCurrentPassword(e.target.value)
+          }
+          className="w-full mb-4 p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none"
+        />
+
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) =>
+            setNewPassword(e.target.value)
+          }
+          className="w-full mb-4 p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none"
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm New Password"
+          value={confirmPassword}
+          onChange={(e) =>
+            setConfirmPassword(e.target.value)
+          }
+          className="w-full mb-6 p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none"
+        />
+
+        <div className="flex justify-end gap-3">
+
+          <button
+            onClick={() =>
+              setShowPasswordModal(false)
+            }
+            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleChangePassword}
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
+          >
+            Update Password
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </>
+)}
       {showDeleteConfirm && (
   <>
     {/* Backdrop */}

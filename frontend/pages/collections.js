@@ -8,22 +8,32 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  FileText,
 } from "lucide-react";
 
 export default function Collections() {
   const API = "http://localhost:5000/api/collections";
 
+  // ===============================
+  // State
+  // ===============================
+
   const [collections, setCollections] = useState([]);
+  const [collectionNotes, setCollectionNotes] = useState({});
+  const [expandedCollection, setExpandedCollection] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("📁");
-  const [expandedCollection, setExpandedCollection] = useState(null);
-  const [collectionNotes, setCollectionNotes] = useState({});
 
-  // ===========================
+  const [availableNotes, setAvailableNotes] = useState([]);
+  const [selectedNotes, setSelectedNotes] = useState([]);
+  const [activeCollection, setActiveCollection] = useState(null);
+
+  // ===============================
   // Fetch Collections
-  // ===========================
+  // ===============================
 
   const fetchCollections = async () => {
     try {
@@ -31,9 +41,12 @@ export default function Collections() {
 
       if (!user) return;
 
-      const res = await axios.get(`${API}/${user.id}`);
+      const res = await axios.get(
+        `${API}/user/${user.id}`
+      );
 
       setCollections(res.data);
+
     } catch (err) {
       console.error(err);
     }
@@ -43,14 +56,53 @@ export default function Collections() {
     fetchCollections();
   }, []);
 
-  // ===========================
+  // ===============================
+  // Fetch Notes Inside Collection
+  // ===============================
+
+  const fetchCollectionNotes = async (collectionId) => {
+    try {
+      const res = await axios.get(
+        `${API}/${collectionId}/notes`
+      );
+
+      setCollectionNotes((prev) => ({
+        ...prev,
+        [collectionId]: res.data,
+      }));
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ===============================
+  // Expand / Collapse
+  // ===============================
+
+  const toggleCollection = async (collectionId) => {
+
+    if (expandedCollection === collectionId) {
+      setExpandedCollection(null);
+      return;
+    }
+
+    setExpandedCollection(collectionId);
+
+    await fetchCollectionNotes(collectionId);
+
+  };
+
+  // ===============================
   // Create Collection
-  // ===========================
+  // ===============================
 
   const createCollection = async () => {
+
     if (!name.trim()) return;
 
     try {
+
       const user = JSON.parse(localStorage.getItem("user"));
 
       await axios.post(API, {
@@ -63,233 +115,330 @@ export default function Collections() {
       setIcon("📁");
       setShowModal(false);
 
-      fetchCollections();
+      await fetchCollections();
 
     } catch (err) {
       console.error(err);
     }
+
   };
 
-  // ===========================
+  // ===============================
   // Delete Collection
-  // ===========================
+  // ===============================
 
   const deleteCollection = async (id) => {
+
     try {
+
       const user = JSON.parse(localStorage.getItem("user"));
 
-      await axios.delete(`${API}/${id}/${user.id}`);
+      await axios.delete(
+        `${API}/delete/${id}/${user.id}`
+      );
 
-      fetchCollections();
+      if (expandedCollection === id) {
+        setExpandedCollection(null);
+      }
+
+      setCollectionNotes((prev) => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
+
+      await fetchCollections();
 
     } catch (err) {
       console.error(err);
     }
+
   };
-const toggleCollection = async (collectionId) => {
-  if (expandedCollection === collectionId) {
-    setExpandedCollection(null);
-    return;
-  }
 
-  setExpandedCollection(collectionId);
+  // ===============================
+  // Open Add Notes
+  // ===============================
 
-  try {
-    const res = await axios.get(
-      `${API}/${collectionId}/notes`
-    );
+  const openAddNotes = async (collectionId) => {
 
-    setCollectionNotes((prev) => ({
-      ...prev,
-      [collectionId]: res.data,
-    }));
-  } catch (err) {
-    console.error(err);
-  }
-};
+    try {
+
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const res = await axios.get(
+        `${API}/${collectionId}/available/${user.id}`
+      );
+
+      setAvailableNotes(res.data);
+      setSelectedNotes([]);
+      setActiveCollection(collectionId);
+      setShowAddModal(true);
+
+    } catch (err) {
+      console.error(err);
+    }
+
+  };
+
+  // ===============================
+  // Add Notes
+  // ===============================
+
+  const addNotesToCollection = async () => {
+
+    try {
+
+      await axios.post(`${API}/add-note`, {
+        collectionId: activeCollection,
+        noteIds: selectedNotes,
+      });
+
+      await fetchCollectionNotes(activeCollection);
+      await fetchCollections();
+
+      setShowAddModal(false);
+
+    } catch (err) {
+      console.error(err);
+    }
+
+  };
+
+  // ===============================
+  // Remove Note
+  // ===============================
+
+  const removeNoteFromCollection = async (
+    collectionId,
+    noteId
+  ) => {
+
+    try {
+
+      await axios.delete(
+        `${API}/remove-note/${collectionId}/${noteId}`
+      );
+
+      await fetchCollectionNotes(collectionId);
+      await fetchCollections();
+
+    } catch (err) {
+      console.error(err);
+    }
+
+  };
   return (
-    <div
-      className="min-h-screen bg-cover bg-center relative"
-      style={{
-        backgroundImage: "url('/sky.jpg')",
-      }}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+  <div
+    className="min-h-screen bg-cover bg-center relative"
+    style={{
+      backgroundImage: "url('/sky.jpg')",
+    }}
+  >
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/60"></div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-16">
-
-        {/* Header */}
-        <div className="flex justify-between items-center mb-10">
-
-          <div>
-            <h1 className="text-2xl font-semibold mb-6">
-          <span className="text-indigo-500">My Collections</span>
-        </h1>
-
-            <p className="text-gray-300 mt-2">
-              Organize your notes into collections.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 transition text-white"
-          >
-            <Plus size={18} />
-            New Collection
-          </button>
-
-        </div>
-
-        {/* Empty State */}
-
-        {collections.length === 0 ? (
-          <div className="text-center mt-32">
-
-            <Folder
-              size={60}
-              className="mx-auto text-gray-400 mb-5"
-            />
-
-            <h2 className="text-2xl text-white">
-              No Collections Yet
-            </h2>
-
-            <p className="text-gray-400 mt-2">
-              Create your first collection to organize notes.
-            </p>
-
-          </div>
-        ) : (
-          <div className="space-y-5">
-
-  {collections.map((collection) => (
-
-    <div
-      key={collection.id}
-      className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden transition"
-    >
+    <div className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-16">
 
       {/* Header */}
 
-      <div
-        onClick={() => toggleCollection(collection.id)}
-        className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-white/5"
-      >
+      <div className="flex justify-between items-center mb-10">
 
-        <div className="flex items-center gap-5">
+        <div>
+          <h1 className="text-3xl font-bold text-white">
+            My Collections
+          </h1>
 
-          <div className="text-5xl">
-            {collection.icon}
-          </div>
-
-          <div>
-
-            <h2 className="text-xl font-semibold text-white">
-              {collection.name}
-            </h2>
-
-            <p className="text-gray-400 text-sm">
-              {collectionNotes[collection.id]?.length || 0} Notes
-            </p>
-
-          </div>
-
+          <p className="text-gray-400 mt-2">
+            Organize your notes into beautiful collections.
+          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteCollection(collection.id);
-            }}
-            className="text-red-400 hover:text-red-500"
-          >
-            <Trash2 size={18} />
-          </button>
-
-          {expandedCollection === collection.id ? (
-            <ChevronDown className="text-gray-300" />
-          ) : (
-            <ChevronRight className="text-gray-300" />
-          )}
-
-        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+        >
+          <Plus size={18} />
+          New Collection
+        </button>
 
       </div>
 
-      {/* Expanded Area */}
+      {/* Empty State */}
 
-      {expandedCollection === collection.id && (
+      {collections.length === 0 ? (
 
-        <div className="border-t border-white/10 p-6">
+        <div className="text-center mt-28">
 
-          <button
-            className="mb-5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
-          >
-            + Add Existing Note
-          </button>
+          <Folder
+            size={70}
+            className="mx-auto text-gray-500 mb-6"
+          />
 
-          {collectionNotes[collection.id]?.length === 0 ? (
+          <h2 className="text-3xl text-white font-semibold">
+            No Collections Yet
+          </h2>
 
-            <p className="text-gray-400">
-              No notes added yet.
-            </p>
+          <p className="text-gray-400 mt-3">
+            Create your first collection and organize your notes.
+          </p>
 
-          ) : (
+        </div>
 
-            <div className="space-y-3">
+      ) : (
 
-              {(collectionNotes[collection.id] || []).map((note) => (
+        <div className="space-y-5">
 
-                <div
-                  key={note.id}
-                  className="flex justify-between items-center rounded-xl bg-white/5 p-4"
-                >
+          {collections.map((collection) => (
 
-                  <div className="flex items-center gap-3">
+            <div
+              key={collection.id}
+              className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden"
+            >
 
-                    <FileText
-                      size={18}
-                      className="text-indigo-400"
-                    />
+              {/* Collection Header */}
 
-                    <span className="text-white">
-                      {note.title}
-                    </span>
+              <div
+                className="flex justify-between items-center px-6 py-5 cursor-pointer hover:bg-white/5"
+                onClick={() => toggleCollection(collection.id)}
+              >
+
+                <div className="flex items-center gap-5">
+
+                  <div className="text-4xl">
+                    {collection.icon}
+                  </div>
+
+                  <div>
+
+                    <h2 className="text-xl font-semibold text-white">
+                      {collection.name}
+                    </h2>
+
+                    <p className="text-gray-400 text-sm">
+                      {collection.note_count} Notes
+                    </p>
 
                   </div>
 
+                </div>
+
+                <div
+                  className="flex items-center gap-3"
+                  onClick={(e) => e.stopPropagation()}
+                >
+
                   <button
+                    onClick={() =>
+                      openAddNotes(collection.id)
+                    }
+                    className="mb-5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+                  >
+                    Add Existing Notes
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      deleteCollection(collection.id)
+                    }
                     className="text-red-400 hover:text-red-500"
                   >
-                    Remove
+                    <Trash2 size={18} />
                   </button>
+
+                  {expandedCollection === collection.id ? (
+                    <ChevronDown
+                      className="text-gray-300"
+                      onClick={() =>
+                        toggleCollection(collection.id)
+                      }
+                    />
+                  ) : (
+                    <ChevronRight
+                      className="text-gray-300"
+                      onClick={() =>
+                        toggleCollection(collection.id)
+                      }
+                    />
+                  )}
 
                 </div>
 
-              ))}
+              </div>
+
+              {/* Expanded Section */}
+
+              {expandedCollection === collection.id && (
+
+                <div className="border-t border-white/10 p-5">
+
+                  {collectionNotes[collection.id]?.length === 0 ? (
+
+                    <p className="text-gray-400">
+                      No notes in this collection.
+                    </p>
+
+                  ) : (
+
+                    <div className="space-y-4">
+
+                      {(collectionNotes[collection.id] || []).map((note) => (
+
+                        <div
+                          key={note.id}
+                          className="flex justify-between items-start bg-white/5 border border-white/10 rounded-xl p-4"
+                        >
+
+                          <div>
+
+                            <h3 className="text-white font-semibold">
+                              {note.title}
+                            </h3>
+
+                            <p className="text-gray-400 mt-2 text-sm">
+                              {note.content.length > 120
+                                ? note.content.substring(0, 120) + "..."
+                                : note.content}
+                            </p>
+
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              removeNoteFromCollection(
+                                collection.id,
+                                note.id
+                              )
+                            }
+                            className="text-red-400 hover:text-red-500"
+                            title="Remove Note"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+
+                        </div>
+
+                      ))}
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              )}
 
             </div>
 
-          )}
+          ))}
 
         </div>
 
       )}
 
     </div>
-
-  ))}
-
-</div>
-        )}
-
-      </div>
-
-      {/* Create Collection Modal */}
+          {/* ==========================
+          Create Collection Modal
+      =========================== */}
 
       {showModal && (
         <>
@@ -300,7 +449,7 @@ const toggleCollection = async (collectionId) => {
 
           <div className="fixed inset-0 flex items-center justify-center z-50">
 
-            <div className="w-[380px] rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 p-6">
+            <div className="w-[400px] rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 p-6">
 
               <h2 className="text-2xl font-semibold text-white mb-6">
                 New Collection
@@ -326,7 +475,7 @@ const toggleCollection = async (collectionId) => {
 
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-5 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20"
+                  className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white"
                 >
                   Cancel
                 </button>
@@ -345,6 +494,115 @@ const toggleCollection = async (collectionId) => {
           </div>
         </>
       )}
+
+      {/* ==========================
+          Add Existing Notes Modal
+      =========================== */}
+
+      {showAddModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={() => setShowAddModal(false)}
+          />
+
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+
+            <div className="w-[550px] max-h-[600px] overflow-y-auto rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 p-6">
+
+              <h2 className="text-2xl font-semibold text-white mb-6">
+                Add Existing Notes
+              </h2>
+
+              {availableNotes.length === 0 ? (
+
+                <p className="text-gray-400">
+                  No available notes.
+                </p>
+
+              ) : (
+
+                <div className="space-y-3">
+
+                  {availableNotes.map((note) => (
+
+                    <label
+                      key={note.id}
+                      className="flex items-start gap-3 bg-white/5 rounded-xl p-3 cursor-pointer border border-white/10"
+                    >
+
+                      <input
+                        type="checkbox"
+                        checked={selectedNotes.includes(note.id)}
+                        onChange={(e) => {
+
+                          if (e.target.checked) {
+
+                            setSelectedNotes([
+                              ...selectedNotes,
+                              note.id,
+                            ]);
+
+                          } else {
+
+                            setSelectedNotes(
+                              selectedNotes.filter(
+                                (id) => id !== note.id
+                              )
+                            );
+
+                          }
+
+                        }}
+                      />
+
+                      <div>
+
+                        <h3 className="text-white font-medium">
+                          {note.title}
+                        </h3>
+
+                        <p className="text-gray-400 text-sm mt-1">
+                          {note.content.length > 90
+                            ? note.content.substring(0, 90) + "..."
+                            : note.content}
+                        </p>
+
+                      </div>
+
+                    </label>
+
+                  ))}
+
+                </div>
+
+              )}
+
+              <div className="flex justify-end gap-3 mt-6">
+
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={addNotesToCollection}
+                  disabled={selectedNotes.length === 0}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white disabled:opacity-50"
+                >
+                  Add Notes
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </>
+      )}
+
     </div>
   );
 }
