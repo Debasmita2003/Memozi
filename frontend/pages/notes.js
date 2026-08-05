@@ -308,7 +308,7 @@ return (
 >
   <div className="absolute inset-0 bg-black/60"></div>
 
-  <div className="relative z-10 max-w-5xl mx-auto px-30 pt-32 pb-16 text-white">
+  <div className="relative z-10 max-w-3xl mx-auto px-8 pt-32 pb-16 text-white">
 
     <h1 className="text-2xl font-semibold mb-6">
       <span className="text-indigo-500">
@@ -316,7 +316,7 @@ return (
       </span>
     </h1>
 
-    <div className="backdrop-blur-xl bg-white/10 p-6 rounded-2xl border border-white/20 shadow-xl mb-10">
+    <div className="w-full max-w-3xl mx-auto backdrop-blur-xl bg-white/10 p-6 rounded-2xl border border-white/20 shadow-xl mb-10">
 
       {/* ---------------- Title ---------------- */}
 
@@ -465,7 +465,7 @@ return (
               setShowContentPalette((prev) => !prev);
               setShowTitlePalette(false);
             }}
-            className="ml-auto rounded p-2 hover:bg-white/10"
+            className="ml-auto rounded p-2 hover:bg-white/10 "
           >
             <Palette size={16} />
           </button>
@@ -531,6 +531,7 @@ return (
       </div>
 
     </div>
+    </div>
 
     {/* ---------- Notes ---------- */}
 
@@ -541,18 +542,33 @@ return (
       </p>
 
     ) : (
+      <div className="relative z-10 max-w-6xl mx-auto px-8 pt-15 pb-16 text-white">
 
-      <div className="grid gap-6 md:grid-cols-2">
-              {sortedNotes.map((note) => (
+      <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+  {sortedNotes.map((note) => (
 
-          <div
-            key={note.id}
-            className="relative rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-xl shadow-lg transition-all duration-300 hover:bg-white/15 hover:shadow-indigo-500/20"
-            style={{
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-            }}
-          >
+    <div
+      key={note.id}
+      className="
+        break-inside-avoid
+        mb-6
+        relative
+        rounded-2xl
+        border border-white/20
+        bg-white/10
+        p-6
+        backdrop-blur-xl
+        shadow-lg
+        transition-all
+        duration-300
+        hover:bg-white/15
+        hover:shadow-indigo-500/20
+      "
+      style={{
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+      }}
+    >
 
             {/* Top Right Icons */}
 
@@ -600,6 +616,36 @@ return (
                 __html: note.content,
               }}
             />
+{/* Footer */}
+
+<div className="mt-6 pt-4 border-t border-white/10">
+
+  <p className="text-xs text-gray-400">
+                    Created{" "}
+                    {new Date(note.created_at).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      }
+                    )}
+                  </p>
+
+                  {note.updated_at &&
+                    note.updated_at !== note.created_at && (
+                      <p className="text-xs text-gray-300 mt-1">
+                        Edited{" "}
+                        {new Date(
+                          note.updated_at
+                        ).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+)}
+</div>
 
           </div>
 
@@ -607,10 +653,11 @@ return (
 
       </div>
 
-    )}
-
+    
   </div>
 
-</div>
+)}</div>
 );
+
+
 }
