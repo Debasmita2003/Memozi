@@ -10,7 +10,9 @@ backend/node_modules/
 # Next.js build folder
 .next/
 frontend/.next/
-backend/uploads/profile
+
+# Uploads
+backend/uploads/
 
 # Build folders
 frontend/dist/
