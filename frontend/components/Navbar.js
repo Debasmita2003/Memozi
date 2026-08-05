@@ -269,53 +269,7 @@ export default function Navbar() {
               )}
 
             </div>
-                        {/* ================= Notifications ================= */}
-
-            <div className="relative" ref={notificationRef}>
-
-              <button
-                onClick={() =>
-                  setNotificationsOpen(!notificationsOpen)
-                }
-                className="relative text-gray-400 hover:text-white transition"
-              >
-                <Bell size={20} />
-
-                <span
-                  className="absolute -top-1 -right-1
-                  h-2 w-2 rounded-full bg-indigo-500"
-                />
-              </button>
-
-              {notificationsOpen && (
-                <div
-                  className="
-                  absolute
-                  right-0
-                  mt-3
-                  w-64
-                  rounded-xl
-                  border
-                  border-white/20
-                  bg-white/10
-                  backdrop-blur-xl
-                  shadow-xl
-                  p-4
-                  text-sm
-                  text-white
-                "
-                >
-                  <p className="font-medium mb-2">
-                    Notifications
-                  </p>
-
-                  <p className="text-gray-300">
-                    No new notifications 🎉
-                  </p>
-                </div>
-              )}
-
-            </div>
+                        
 
             {/* ================= Profile ================= */}
 

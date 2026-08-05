@@ -308,7 +308,7 @@ return (
 >
   <div className="absolute inset-0 bg-black/60"></div>
 
-  <div className="relative z-10 max-w-3xl mx-auto px-8 pt-32 pb-16 text-white">
+  <div className="relative z-10 max-w-4xl mx-auto px-8 pt-32 pb-16 text-white">
 
     <h1 className="text-2xl font-semibold mb-6">
       <span className="text-indigo-500">

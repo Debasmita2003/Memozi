@@ -178,9 +178,6 @@ const handleChangePassword = async () => {
             </div>
 
             {[
-              ["Auto Save Notes", "auto_save"],
-              ["Notifications", "notifications"],
-              ["Compact Mode", "compact_mode"],
               ["Spell Check", "spell_check"],
             ].map(([label, key]) => (
 

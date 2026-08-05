@@ -227,6 +227,13 @@ export default function Collections() {
     }
 
   };
+  const stripHtml = (html) => {
+  if (!html) return "";
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
+
   return (
   <div
     className="min-h-screen bg-cover bg-center relative"
@@ -237,27 +244,25 @@ export default function Collections() {
     {/* Overlay */}
     <div className="absolute inset-0 bg-black/60"></div>
 
-    <div className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-16">
+    <div className="relative z-10 max-w-4xl mx-auto px-8 pt-32 pb-16">
 
       {/* Header */}
 
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between items-center mb-3">
 
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            My Collections
-          </h1>
-
-          <p className="text-gray-400 mt-2">
-            Organize your notes into beautiful collections.
-          </p>
+          <h1 className="text-2xl font-semibold mb-6">
+      <span className="text-indigo-500">
+        My Collections
+      </span>
+    </h1>
         </div>
 
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
         >
-          <Plus size={18} />
+          <Plus size={14} />
           New Collection
         </button>
 
@@ -286,7 +291,12 @@ export default function Collections() {
 
       ) : (
 
-        <div className="space-y-5">
+        <div className="h-[calc(100vh-260px)]
+    overflow-y-auto
+    glass-scrollbar
+    pr-2
+    space-y-5
+">
 
           {collections.map((collection) => (
 
@@ -298,19 +308,19 @@ export default function Collections() {
               {/* Collection Header */}
 
               <div
-                className="flex justify-between items-center px-6 py-5 cursor-pointer hover:bg-white/5"
+                className="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-white/10"
                 onClick={() => toggleCollection(collection.id)}
               >
 
                 <div className="flex items-center gap-5">
 
-                  <div className="text-4xl">
+                  <div className="text-2xl">
                     {collection.icon}
                   </div>
 
                   <div>
 
-                    <h2 className="text-xl font-semibold text-white">
+                    <h2 className="text-l font-semibold text-white">
                       {collection.name}
                     </h2>
 
@@ -331,9 +341,9 @@ export default function Collections() {
                     onClick={() =>
                       openAddNotes(collection.id)
                     }
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
                   >
-                    <Plus size={18} />
+                    <Plus size={14} />
                     Add Existing Notes
                   </button>
 
@@ -395,11 +405,12 @@ export default function Collections() {
                               {note.title}
                             </h3>
 
-                            <p className="text-gray-400 mt-2 text-sm">
-                              {note.content.length > 120
-                                ? note.content.substring(0, 120) + "..."
-                                : note.content}
-                            </p>
+                            <div
+  className="prose prose-invert max-w-none text-sm mt-2"
+  dangerouslySetInnerHTML={{
+    __html: note.content,
+  }}
+/>
 
                           </div>
 
@@ -511,8 +522,8 @@ export default function Collections() {
 
             <div className="w-[550px] max-h-[600px] overflow-y-auto rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 p-6">
 
-              <h2 className="text-2xl font-semibold text-white mb-6">
-                Add Existing Notes
+              <h2 className="text-xl font-semibold text-indigo-500 mb-6">
+                Add Notes
               </h2>
 
               {availableNotes.length === 0 ? (
@@ -564,10 +575,10 @@ export default function Collections() {
                         </h3>
 
                         <p className="text-gray-400 text-sm mt-1">
-                          {note.content.length > 90
-                            ? note.content.substring(0, 90) + "..."
-                            : note.content}
-                        </p>
+  {stripHtml(note.content).length > 90
+    ? stripHtml(note.content).substring(0, 90) + "..."
+    : stripHtml(note.content)}
+</p>
 
                       </div>
 

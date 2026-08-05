@@ -10,9 +10,9 @@ export default function Home() {
       <div className="absolute inset-0 bg-black/60"></div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-20 text-white">
+      <div className="relative z-10 max-w-6xl mx-auto px-3 pt-32 pb-20 text-white">
 
-        <h1 className="text-5xl md:text-6xl font-bold mb-6">
+        <h1 className="text-5xl md:text-6xl font-semibold mb-6">
           Memozi
         </h1>
 
@@ -20,11 +20,11 @@ export default function Home() {
           Welcome to Memozi
         </h2>
 
-        <p className="text-xs md:text-xl text-gray-200 mb-10 max-w-xl leading-relaxed">
-          Organize your thoughts, create beautiful <span className="text-indigo-400 font-semibold">notes</span>, and keep everything
-          structured with <span className="text-indigo-400 font-semibold">Collections</span>.
-          A modern workspace designed to help you capture ideas effortlessly.
-        </p>
+        <p className="text-[11px] md:text-xl text-gray-200 mb-6 max-w-lg leading-relaxed">
+  Organize your thoughts, create beautiful notes and keep everything
+  structured with Collections.
+  A modern workspace designed to help you capture ideas effortlessly.
+</p>
 
         <div className="flex flex-col sm:flex-row gap-4">
 
