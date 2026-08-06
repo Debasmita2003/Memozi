@@ -143,13 +143,12 @@ router.put("/profile", async (req, res) => {
     }
 
     const result = await pool.query(
-      `UPDATE users
-       SET name = $1,
-           profile_picture = $2
-       WHERE id = $3
-       RETURNING id, name, email, profile_picture, language`,
-      [name, profile_picture, id]
-    );
+  `UPDATE users
+   SET name = $1
+   WHERE id = $2
+   RETURNING id, name, email, profile_picture`,
+  [name, id]
+);
 
     res.json({
       message: "Profile updated successfully",
