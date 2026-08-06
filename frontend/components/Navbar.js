@@ -302,7 +302,7 @@ export default function Navbar() {
                     <img
   src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profile_picture}`}
   alt="Profile"
-  className="h-full w-full object-cover"
+  className="w-8 h-8 rounded-full object-cover"
 />
 
                   ) : (
@@ -561,7 +561,7 @@ export default function Navbar() {
                     <img
   src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profile_picture}`}
   alt="Profile"
-  className="h-full w-full object-cover"
+  className="w-8 h-8 rounded-full object-cover"
 />
 
                   ) : (
