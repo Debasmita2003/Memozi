@@ -77,7 +77,7 @@ export default function Notes() {
     "#000000",
   ];
 
-  const API = "http://localhost:5000/api/notes";
+  const API = `${process.env.NEXT_PUBLIC_API_URL}/api/notes`;
 
   /* -------------------- TipTap Editor -------------------- */
 

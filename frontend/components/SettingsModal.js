@@ -59,7 +59,7 @@ const [confirmPassword, setConfirmPassword] = useState("");
 const handleDeleteAccount = async () => {
   try {
     await axios.delete(
-      `http://localhost:5000/api/auth/delete-account/${settings.id}`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/delete-account/${settings.id}`
     );
 
     localStorage.removeItem("user");
@@ -90,7 +90,7 @@ const handleChangePassword = async () => {
   try {
 
     const res = await axios.put(
-      "http://localhost:5000/api/auth/change-password",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/change-password`,
       {
         userId: settings.id,
         currentPassword,
@@ -121,7 +121,7 @@ const handleChangePassword = async () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/auth/settings",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/settings`,
         settings
       );
 

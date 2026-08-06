@@ -300,10 +300,10 @@ export default function Navbar() {
                   {user.profile_picture ? (
 
                     <img
-                      src={`http://localhost:5000/${user.profile_picture}`}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                    />
+  src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profile_picture}`}
+  alt="Profile"
+  className="h-full w-full object-cover"
+/>
 
                   ) : (
 
@@ -559,10 +559,10 @@ export default function Navbar() {
                   {user.profile_picture ? (
 
                     <img
-                      src={`http://localhost:5000/${user.profile_picture}`}
-                      alt="Profile"
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
+  src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profile_picture}`}
+  alt="Profile"
+  className="h-full w-full object-cover"
+/>
 
                   ) : (
 

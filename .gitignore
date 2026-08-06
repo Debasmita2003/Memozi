@@ -20,7 +20,7 @@ frontend/build/
 
 # Environment variables
 .env
-frontend/.env
+frontend/.env.local
 backend/.env
 
 # Logs

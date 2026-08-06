@@ -35,7 +35,7 @@ export default function LoginModal({
     setLoading(true);
 
     const res = await axios.post(
-      "http://localhost:5000/api/auth/login",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
       {
         email: form.email,
         password: form.password,

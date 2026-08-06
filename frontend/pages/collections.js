@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 export default function Collections() {
-  const API = "http://localhost:5000/api/collections";
+  const API = `${process.env.NEXT_PUBLIC_API_URL}/api/collections`;
 
   // ===============================
   // State

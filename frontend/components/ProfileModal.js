@@ -49,7 +49,7 @@ export default function ProfileModal({
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/upload-profile",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/upload-profile`,
         formData,
         {
           headers: {
@@ -77,7 +77,7 @@ export default function ProfileModal({
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/auth/profile",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`,
         {
           id: localUser.id,
           name: localUser.name,
@@ -134,7 +134,7 @@ export default function ProfileModal({
 
               {localUser.profile_picture ? (
                 <img
-                  src={`http://localhost:5000/${localUser.profile_picture}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/${localUser.profile_picture}`}
                   alt="Profile"
                   className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500"
                 />

@@ -56,7 +56,7 @@ const [success, setSuccess] = useState("");
     setLoading(true);
 
     const res = await axios.post(
-      "http://localhost:5000/api/auth/signup",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
       {
         name: form.name,
         email: form.email,
