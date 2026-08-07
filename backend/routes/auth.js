@@ -232,15 +232,15 @@ router.post(
         });
       }
 
-      const imagePath = `uploads/profile/${req.file.filename}`;
+     const imageUrl = req.file.path;
 
-      const result = await pool.query(
-        `UPDATE users
-         SET profile_picture = $1
-         WHERE id = $2
-         RETURNING *`,
-        [imagePath, id]
-      );
+const result = await pool.query(
+  `UPDATE users
+   SET profile_picture = $1
+   WHERE id = $2
+   RETURNING *`,
+  [imageUrl, id]
+);
 
       if (result.rows.length === 0) {
         return res.status(404).json({
