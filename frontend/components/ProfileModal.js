@@ -134,10 +134,10 @@ export default function ProfileModal({
 
               {localUser.profile_picture ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/${localUser.profile_picture}`}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500"
-                />
+  src={localUser.profile_picture}
+  alt="Profile"
+  className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500"
+/>
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-3xl font-bold text-white">
                   {localUser.name?.charAt(0)?.toUpperCase() || "U"}
