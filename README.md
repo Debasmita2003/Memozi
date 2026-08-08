@@ -1,37 +1,66 @@
 # 📝 Memozi
 
-A modern full-stack note-taking application built with **Next.js**, **Express.js**, and **PostgreSQL**. Memozi allows users to create, manage, and organize notes through a clean and responsive interface.
+A modern full-stack note-taking application built with **Next.js, React, Express.js, PostgreSQL, and Cloudinary**.
+
+Memozi allows users to securely create, edit, organize, search, pin, and manage their personal notes with persistent cloud storage and profile management.
+
+---
+
+## 🌐 Live Demo
+
+🚀 **Memozi:**  
+https://memozi-project.vercel.app/
 
 ---
 
 ## ✨ Features
 
+### 📝 Notes
+
 - 📝 Create notes
-- 📖 View all saved notes
-- 🗑️ Delete notes
 - ✏️ Edit notes
-- 🎨 Custom note colors
-- 📌 Pin notes
-- 🔍 Search functionality
-- 💾 Persistent storage with PostgreSQL
-- 🎨 Modern glassmorphism UI
-- 📱 Responsive design
-- 👤 User Authentication
+- 🗑️ Delete notes
+- 📖 View saved notes
+- 📌 Pin important notes
+- 🎨 Customize note colors
+- 🔍 Search notes
+- 💾 Persistent database storage
+- 👤 User-specific notes
 
----
+### 👤 Authentication
 
-## 📸 Preview
+- 📝 User registration
+- 🔐 Secure login
+- 🔑 JWT-based authentication
+- 🔒 Password hashing with bcrypt
+- 👤 User-specific data
+- 🚪 Account deletion
+- 🔄 Change password
 
-> Add screenshots of your application here.
+### 🖼️ Profile Management
 
-Example:
+- 👤 View user profile
+- ✏️ Edit username
+- 📷 Upload profile picture
+- ☁️ Cloudinary image storage
+- 💾 Persistent profile pictures
+- 🔤 User-name initial fallback when no profile image is available
 
-```
-screenshots/
-├── home.png
-├── notes.png
-└── bookmarks.png
-```
+### ⚙️ User Settings
+
+- 💾 Auto-save settings
+- 🔔 Notification settings
+- 📱 Compact mode
+- ✍️ Spell-check settings
+
+### 🎨 UI & Experience
+
+- ✨ Modern glassmorphism interface
+- 🌌 Dark-themed design
+- 📱 Responsive layout
+- 🎨 Modern gradients
+- ⚡ Smooth user experience
+- 🖥️ Desktop and mobile friendly
 
 ---
 
@@ -41,39 +70,68 @@ screenshots/
 
 - Next.js
 - React
-- CSS
+- Tailwind CSS
+- Axios
+- Lucide React
 
 ### Backend
 
 - Node.js
 - Express.js
+- JWT
+- bcrypt
+- Multer
 
 ### Database
 
 - PostgreSQL
-- pg
+- Neon PostgreSQL
+- `pg` / node-postgres
+
+### Image Storage
+
+- Cloudinary
+- multer-storage-cloudinary
+
+### Deployment
+
+- Vercel — Frontend
+- Render — Backend
+- Neon — PostgreSQL Database
+- Cloudinary — Profile Image Storage
 
 ---
 
 ## 📂 Project Structure
 
-```
+```text
 Memozi/
 │
-├── Frontend/
+├── frontend/
 │   ├── app/
 │   ├── components/
 │   ├── pages/
 │   ├── public/
 │   ├── services/
-│   └── package.json
+│   ├── package.json
+│   └── ...
 │
-├── Backend/
+├── backend/
 │   ├── config/
+│   │   ├── db.js
+│   │   └── cloudinary.js
+│   │
+│   ├── middleware/
+│   │   └── upload.js
+│   │
 │   ├── routes/
+│   │   ├── auth.js
+│   │   ├── notes.js
+│   │   └── ...
+│   │
 │   ├── package.json
 │   ├── server.js
-│   └── .env
+│   └── ...
 │
 ├── .gitignore
 └── README.md
@@ -81,50 +139,80 @@ Memozi/
 
 ---
 
-## 🚀 Installation
+# 🚀 Getting Started
 
-### 1. Clone the repository
+Follow the steps below to run Memozi locally.
+
+## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Memozi.git
+git clone https://github.com/Debasmita2003/Memozi.git
 cd Memozi
 ```
 
 ---
 
-### 2. Install Frontend Dependencies
+## 2. Install Frontend Dependencies
 
 ```bash
-cd Frontend
+cd frontend
 npm install
 ```
 
 ---
 
-### 3. Install Backend Dependencies
+## 3. Install Backend Dependencies
+
+Open another terminal:
 
 ```bash
-cd ../Backend
+cd backend
 npm install
 ```
 
 ---
 
-## 🗄️ Database Setup
+# 🗄️ Database Setup
 
-Install PostgreSQL and create a database named:
+Memozi uses **PostgreSQL** for persistent data storage.
 
-```
+For local development, create a PostgreSQL database named:
+
+```text
 memozi
 ```
 
-Create the required tables.
+The production application uses **Neon PostgreSQL**.
 
-### Notes Table
+---
+
+## 👤 Users Table
+
+Example users table:
+
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    profile_picture TEXT,
+    auto_save BOOLEAN DEFAULT TRUE,
+    notifications BOOLEAN DEFAULT TRUE,
+    compact_mode BOOLEAN DEFAULT FALSE,
+    spell_check BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 📝 Notes Table
 
 ```sql
 CREATE TABLE notes (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     content TEXT,
     color VARCHAR(30) DEFAULT '#ffffff',
@@ -134,98 +222,325 @@ CREATE TABLE notes (
 );
 ```
 
-### Bookmarks Table
-
-```sql
-CREATE TABLE bookmarks (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    url TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+> The exact database schema may vary depending on the current version of the application.
 
 ---
 
-## ⚙️ Environment Variables
+# ⚙️ Environment Variables
 
-Create a `.env` file inside the **Backend** folder.
+Create a `.env` file inside the `backend` folder.
 
 ```env
-DB_HOST=localhost
+DB_HOST=your_database_host
 DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=YOUR_PASSWORD
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
 DB_NAME=memozi
 
 PORT=5000
+
+JWT_SECRET=your_jwt_secret
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+FRONTEND_URL=http://localhost:3000
 ```
+
+Create a `.env.local` file inside the `frontend` folder:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+For production:
+
+```env
+NEXT_PUBLIC_API_URL=https://memozi-backend.onrender.com
+```
+
+> ⚠️ Never commit `.env` or `.env.local` files, database passwords, JWT secrets, or Cloudinary API secrets to GitHub.
 
 ---
 
-## ▶️ Running the Application
+# ▶️ Running the Application
 
-### Start Backend
+## Start the Backend
 
 ```bash
-cd Backend
+cd backend
 npm start
 ```
 
-Backend runs on:
+The backend runs on:
 
-```
+```text
 http://localhost:5000
 ```
 
 ---
 
-### Start Frontend
+## Start the Frontend
+
+In another terminal:
 
 ```bash
-cd Frontend
+cd frontend
 npm run dev
 ```
 
-Frontend runs on:
+The frontend runs on:
 
-```
+```text
 http://localhost:3000
 ```
 
 ---
 
-## 📡 API Endpoints
+# 📡 API Endpoints
 
-### Notes
+## 🔐 Authentication
 
 | Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/api/notes` | Get all notes |
-| POST | `/api/notes` | Create a new note |
+|---|---|---|
+| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/login` | Login user |
+| PUT | `/api/auth/profile` | Update user profile |
+| POST | `/api/auth/upload-profile` | Upload profile picture |
+| PUT | `/api/auth/settings` | Update user settings |
+| PUT | `/api/auth/change-password` | Change password |
+| DELETE | `/api/auth/delete-account/:id` | Delete user account |
+
+---
+
+## 📝 Notes
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/notes` | Get notes |
+| POST | `/api/notes` | Create a note |
+| PUT | `/api/notes/:id` | Update a note |
 | DELETE | `/api/notes/:id` | Delete a note |
 
-### Bookmarks
+---
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/api/bookmarks` | Get all bookmarks |
-| POST | `/api/bookmarks` | Create a bookmark |
-| DELETE | `/api/bookmarks/:id` | Delete a bookmark |
+# ☁️ Profile Image Storage
+
+Memozi uses **Cloudinary** for persistent profile image storage.
+
+When a user uploads a profile picture:
+
+```text
+User
+  │
+  ▼
+Next.js Frontend
+  │
+  ▼
+Express.js API
+  │
+  ▼
+Multer
+  │
+  ▼
+Cloudinary
+  │
+  ▼
+Cloudinary Image URL
+  │
+  ▼
+PostgreSQL
+```
+
+The Cloudinary URL is stored in the user's `profile_picture` column in PostgreSQL.
+
+Example:
+
+```text
+https://res.cloudinary.com/your-cloud/image/upload/...
+```
+
+Using Cloudinary ensures that profile pictures remain available even when the backend server is redeployed or restarted.
 
 ---
 
-## 🔮 Future Improvements
+# 🔐 Security
 
-- 🔖 Bookmark support
-- 🏷️ Categories & Tags
-- ☁️ Cloud Deployment
+Memozi uses several security mechanisms:
+
+- 🔑 JWT authentication
+- 🔒 bcrypt password hashing
+- 🔐 Environment variables for sensitive credentials
+- 🗄️ PostgreSQL parameterized queries
+- ☁️ Cloudinary for persistent image storage
+- 🚫 Sensitive credentials excluded from Git
+
+Never expose or commit:
+
+```text
+DB_PASSWORD
+JWT_SECRET
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+```
+
+---
+
+# 🌍 Deployment
+
+Memozi is deployed using multiple cloud services.
+
+| Service | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Neon PostgreSQL |
+| Profile Images | Cloudinary |
+
+### 🌐 Frontend
+
+https://memozi-project.vercel.app/
+
+### ⚙️ Backend
+
+https://memozi-backend.onrender.com
+
+---
+
+# 🔄 Deployment Workflow
+
+Memozi is connected to GitHub.
+
+After making changes:
+
+```bash
+git add .
+git commit -m "Update Memozi"
+git push origin main
+```
+
+The connected deployment services can automatically deploy the latest changes from the GitHub repository.
+
+```text
+                 GitHub
+                /      \
+               /        \
+              ▼          ▼
+          Vercel       Render
+            │             │
+            ▼             ▼
+        Frontend       Backend
+                           │
+                    ┌──────┴──────┐
+                    ▼             ▼
+                  Neon       Cloudinary
+                PostgreSQL     Images
+```
+
+---
+
+# 📸 Screenshots
+
+Add screenshots of your application here.
+
+Recommended structure:
+
+```text
+screenshots/
+├── home.png
+├── notes.png
+├── profile.png
+└── settings.png
+```
+
+After adding screenshots, you can display them in this README:
+
+```md
+![Memozi Home](screenshots/home.png)
+
+![Memozi Notes](screenshots/notes.png)
+
+![Memozi Profile](screenshots/profile.png)
+
+![Memozi Settings](screenshots/settings.png)
+```
+
+---
+
+# 🔮 Future Improvements
+
+- 🏷️ Categories and tags
+- 🔍 Advanced note filtering
+- 📝 Rich text editor
+- 📤 Export notes
+- 🔗 Share notes
+- 📧 Email verification
+- 🔑 Forgot password / password reset
 - 📱 Progressive Web App (PWA)
+- ⚡ Improved performance and caching
+- 🌐 Custom domain
+- 📊 Note analytics
 
 ---
 
-## 👩‍💻 Author
+# 🤝 Contributing
 
-**Debasmita Jana**
+Contributions are welcome.
 
-- GitHub: https://github.com/Debasmita2003
+## 1. Fork the Repository
+
+```bash
+git fork https://github.com/Debasmita2003/Memozi.git
+```
+
+## 2. Create a New Branch
+
+```bash
+git checkout -b feature/new-feature
+```
+
+## 3. Make Your Changes
+
+Implement your changes and test them locally.
+
+## 4. Commit Your Changes
+
+```bash
+git add .
+git commit -m "Add new feature"
+```
+
+## 5. Push the Branch
+
+```bash
+git push origin feature/new-feature
+```
+
+## 6. Create a Pull Request
+
+Open a pull request on GitHub describing your changes.
+
+---
+
+# 👩‍💻 Author
+
+## Debasmita Jana
+
+💻 **GitHub:**  
+https://github.com/Debasmita2003
+
+🚀 **Live Project:**  
+https://memozi-project.vercel.app/
+
+---
+
+# ⭐ Support
+
+If you like Memozi, consider giving the repository a ⭐ on GitHub!
+
+---
+
+## 📄 License
+
+This project was created for learning, development, and portfolio purposes.
